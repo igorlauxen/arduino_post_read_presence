@@ -6,7 +6,6 @@ String INUMBER_TRIAL = "i841640";
 String DEVICE_ID = "32b9f043-8569-464e-8bc4-95c567d98d00";
 String MESSAGE_TYPE = "e0a6c3bab615e97310f0";
 //dummy entries
-int CALOR_TEST = 130;
 String URL_TO_SERVICE = "";
 String USER_AUTHENTICATION = "Bearer YOUR_DEVICE_TOKEN";
 
@@ -41,14 +40,30 @@ void post(){
   while (process.running());
 }
 
+/*
+Connect to 5V
+Connect to GND
+Connect to Digital Pin 7
+*/
+
+int pinopir = 7; //Pin connected to sensor PIR
+int value; //Variable used to keep the sensor value
+
 void setup(){
   Bridge.begin();
   while(!Serial);
   Serial.println("Starting...");
+  pinMode(pinopir, INPUT); //Define pin as entry
 }
 
 void loop(){
-  CALOR_TEST = random(1,20);
-  URL_TO_SERVICE = "https://iotmms"+INUMBER_TRIAL+"trial.hanatrial.ondemand.com/com.sap.iotservices.mms/v1/api/http/data/"+DEVICE_ID+"/"+MESSAGE_TYPE+"?test="+CALOR_TEST;
+  value = digitalRead(pinopir); //Le o valor do sensor PIR
+  if (value == LOW) { //sem movimento
+    Serial.println("Frozen");
+  }
+  else{ //movimento
+    Serial.println("On Fire !!!");
+  }
+  URL_TO_SERVICE = "https://iotmms"+INUMBER_TRIAL+"trial.hanatrial.ondemand.com/com.sap.iotservices.mms/v1/api/http/data/"+DEVICE_ID+"/"+MESSAGE_TYPE+"?test="+value;
   post();
 }
